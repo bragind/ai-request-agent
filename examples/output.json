@@ -1,0 +1,9 @@
+{
+  "request_type": "account_access",
+  "summary": "Не могу войти в личный кабинет.",
+  "priority": "high",
+  "needs_human": true,
+  "confidence": 0.92,
+  "provider": "mock"
+}
+

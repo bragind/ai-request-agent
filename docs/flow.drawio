@@ -1,0 +1,28 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="request-agent-flow" name="Flow">
+    <mxGraphModel dx="980" dy="760" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="980" pageHeight="760" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="http" value="HTTP-запрос" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;" vertex="1" parent="1"><mxGeometry x="300" y="30" width="380" height="60" as="geometry"/></mxCell>
+        <mxCell id="validate" value="Валидация и нормализация текста&lt;br&gt;Pydantic + deterministic Python" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;" vertex="1" parent="1"><mxGeometry x="220" y="130" width="540" height="70" as="geometry"/></mxCell>
+        <mxCell id="select" value="Выбор провайдера" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;" vertex="1" parent="1"><mxGeometry x="300" y="240" width="380" height="60" as="geometry"/></mxCell>
+        <mxCell id="provider" value="Ollama или Mock" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;" vertex="1" parent="1"><mxGeometry x="300" y="340" width="380" height="60" as="geometry"/></mxCell>
+        <mxCell id="nlp" value="Классификация и суммаризация&lt;br&gt;request_type, priority, needs_human" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;" vertex="1" parent="1"><mxGeometry x="220" y="440" width="540" height="70" as="geometry"/></mxCell>
+        <mxCell id="result-validation" value="Pydantic-валидация результата" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;" vertex="1" parent="1"><mxGeometry x="220" y="550" width="540" height="60" as="geometry"/></mxCell>
+        <mxCell id="response" value="JSON-ответ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#334155;" vertex="1" parent="1"><mxGeometry x="300" y="650" width="380" height="60" as="geometry"/></mxCell>
+        <mxCell id="error" value="Ошибка Ollama&lt;br&gt;или невалидный JSON" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#c2410c;" vertex="1" parent="1"><mxGeometry x="705" y="260" width="245" height="82" as="geometry"/></mxCell>
+        <mxCell id="fallback" value="Mock fallback" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#c2410c;" vertex="1" parent="1"><mxGeometry x="705" y="430" width="245" height="60" as="geometry"/></mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="http" target="validate"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="validate" target="select"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="select" target="provider"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="provider" target="nlp"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="nlp" target="result-validation"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;" edge="1" parent="1" source="result-validation" target="response"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#c2410c;" edge="1" parent="1" source="error" target="fallback"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;strokeColor=#c2410c;" edge="1" parent="1" source="fallback" target="result-validation"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+
