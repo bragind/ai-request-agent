@@ -11,16 +11,22 @@ from request_agent.prompts import SYSTEM_PROMPT, build_user_prompt
 from request_agent.providers.base import ProviderError
 from request_agent.schemas import LLMResult
 
+# Провайдер инкапсулирует HTTP-вызов Ollama и преобразование недоверенного ответа.
+
 logger = logging.getLogger(__name__)
 
 
 class OllamaProvider:
+    """Получает NLP-результат от локальной Ollama и проверяет её ответ."""
+
     def __init__(self, base_url: str, model: str, timeout_seconds: float) -> None:
         self._base_url = base_url.rstrip("/")
         self._model = model
         self._timeout = timeout_seconds
 
     async def analyze(self, text: str) -> LLMResult:
+        """Отправляет запрос модели и преобразует ответ в строгую схему."""
+
         payload = {
             "model": self._model,
             "stream": False,
@@ -38,6 +44,8 @@ class OllamaProvider:
         except httpx.HTTPError as exc:
             raise ProviderError(f"Ollama request failed: {exc}") from exc
 
+        # Ответ LLM считается недоверенным вводом: модель может нарушить JSON-контракт,
+        # вернуть неизвестные enum или значения вне допустимых диапазонов.
         content = self._extract_content(response.json())
         try:
             data = self._extract_json(content)
@@ -47,12 +55,16 @@ class OllamaProvider:
             raise ProviderError("Ollama returned invalid analysis payload") from exc
 
     def _extract_content(self, data: dict[str, Any]) -> str:
+        """Извлекает строковое содержимое из транспортного ответа Ollama."""
+
         message = data.get("message")
         if not isinstance(message, dict) or not isinstance(message.get("content"), str):
             raise ProviderError("Ollama response does not contain message.content")
         return message["content"]
 
     def _extract_json(self, content: str) -> dict[str, Any]:
+        """Извлекает JSON-объект, включая ответ с Markdown или вводным текстом."""
+
         stripped = content.strip()
         if stripped.startswith("{") and stripped.endswith("}"):
             return json.loads(stripped)
@@ -61,4 +73,3 @@ class OllamaProvider:
         if start == -1 or end == -1 or end <= start:
             raise json.JSONDecodeError("JSON object not found", content, 0)
         return json.loads(stripped[start : end + 1])
-

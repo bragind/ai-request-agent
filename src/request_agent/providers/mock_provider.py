@@ -4,13 +4,19 @@ from dataclasses import dataclass
 
 from request_agent.schemas import LLMResult, Priority, RequestType
 
+# Mock-провайдер обеспечивает автономный и воспроизводимый режим демонстрации.
+
 
 @dataclass(frozen=True)
 class Rule:
+    """Связывает категорию с детерминированным набором ключевых слов."""
+
     request_type: RequestType
     keywords: tuple[str, ...]
 
 
+# Порядок правил важен: первое совпадение завершает классификацию, поэтому
+# проблемы доступа и оплаты имеют приоритет над общими техническими словами.
 # The order is intentional: when several categories match, business-impacting
 # access and money problems should win over generic technical wording.
 CATEGORY_RULES: tuple[Rule, ...] = (
@@ -97,7 +103,11 @@ HIGH_KEYWORDS = (
 
 
 class MockProvider:
+    """Детерминированно имитирует NLP-анализ без внешней модели и случайности."""
+
     async def analyze(self, text: str) -> LLMResult:
+        """Классифицирует обращение и формирует воспроизводимый результат."""
+
         lowered = text.lower()
         request_type, matches = self._classify(lowered)
         priority = self._priority(lowered, request_type)
@@ -121,6 +131,8 @@ class MockProvider:
         return RequestType.OTHER, 0
 
     def _priority(self, lowered: str, request_type: RequestType) -> Priority:
+        # Явные признаки критичности и срочности проверяются раньше категории,
+        # чтобы серьёзность ситуации не терялась при общей формулировке текста.
         if any(keyword in lowered for keyword in CRITICAL_KEYWORDS):
             return Priority.CRITICAL
         if any(keyword in lowered for keyword in HIGH_KEYWORDS):
@@ -145,6 +157,8 @@ class MockProvider:
         return sentence
 
     def _confidence(self, request_type: RequestType, matches: int, priority: Priority) -> float:
+        # Уверенность основана на числе совпавших признаков, ограничена сверху
+        # и остаётся предсказуемой при повторной обработке одного текста.
         if request_type is RequestType.OTHER:
             return 0.55
         confidence = 0.72 + min(matches, 4) * 0.05

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# Промпт описывает контракт LLM, а его фактическое соблюдение проверяют схемы Python.
+
 SYSTEM_PROMPT = """You analyze Russian customer support requests.
 Return only valid JSON. Do not use Markdown. Do not add text outside JSON.
 
@@ -28,4 +30,6 @@ Rules:
 
 
 def build_user_prompt(text: str) -> str:
+    """Формирует пользовательскую часть запроса без изменения исходного текста."""
+
     return f"Analyze this support request and return JSON only:\n{text}"

@@ -4,12 +4,19 @@ from typing import Protocol
 
 from request_agent.schemas import LLMResult
 
+# Общий интерфейс позволяет сервису одинаково вызывать Ollama и mock-реализацию.
+
 
 class ProviderError(RuntimeError):
+    """Обозначает контролируемый сбой провайдера, допускающий fallback."""
+
     pass
 
 
 class LLMProvider(Protocol):
-    async def analyze(self, text: str) -> LLMResult:
-        raise NotImplementedError
+    """Фиксирует единый контракт реального и имитационного провайдеров."""
 
+    async def analyze(self, text: str) -> LLMResult:
+        """Анализирует нормализованный текст и возвращает проверяемый результат."""
+
+        raise NotImplementedError

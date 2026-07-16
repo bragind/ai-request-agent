@@ -6,8 +6,12 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from request_agent.utils.text import normalize_text
 
+# Схемы образуют границу доверия для пользовательского ввода и результата провайдера.
+
 
 class RequestType(StrEnum):
+    """Задаёт закрытый набор категорий пользовательских обращений."""
+
     TECHNICAL_ISSUE = "technical_issue"
     BILLING = "billing"
     ACCOUNT_ACCESS = "account_access"
@@ -18,6 +22,8 @@ class RequestType(StrEnum):
 
 
 class Priority(StrEnum):
+    """Задаёт допустимые уровни срочности обработки обращения."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -25,11 +31,15 @@ class Priority(StrEnum):
 
 
 class AnalyzeRequest(BaseModel):
+    """Валидирует и нормализует входной текст до передачи сервису."""
+
     text: str = Field(..., min_length=3, max_length=5000)
 
     @field_validator("text")
     @classmethod
     def normalize_and_validate_text(cls, value: str) -> str:
+        """Схлопывает пробелы и проверяет содержательную длину текста."""
+
         normalized = normalize_text(value)
         if len(normalized) < 3:
             raise ValueError("text must contain at least 3 non-space characters")
@@ -37,6 +47,8 @@ class AnalyzeRequest(BaseModel):
 
 
 class LLMResult(BaseModel):
+    """Описывает проверенный результат провайдера без транспортных полей."""
+
     model_config = ConfigDict(extra="forbid")
 
     request_type: RequestType
@@ -48,9 +60,12 @@ class LLMResult(BaseModel):
     @field_validator("summary")
     @classmethod
     def normalize_summary(cls, value: str) -> str:
+        """Приводит summary провайдера к единому пробельному формату."""
+
         return normalize_text(value)
 
 
 class AnalyzeResponse(LLMResult):
-    provider: str = Field(..., pattern="^(ollama|mock|mock_fallback)$")
+    """Дополняет результат фактически использованным провайдером."""
 
+    provider: str = Field(..., pattern="^(ollama|mock|mock_fallback)$")
